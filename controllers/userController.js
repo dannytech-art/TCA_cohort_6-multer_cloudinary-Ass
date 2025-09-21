@@ -20,15 +20,15 @@ exports.createUser = async (req, res) => {
     let dpResult = null
     let galleryResults = []
 
-    // Upload display picture (single)
+    // Upload dp which is one
     if (req.files?.dp) {
       dpResult = await cloudinary.uploader.upload(req.files.dp[0].path, {
         folder: "users/dp"
       })
-      fs.unlinkSync(req.files.dp[0].path) // remove local file
+      fs.unlinkSync(req.files.dp[0].path) 
     }
 
-    // Upload gallery (multiple)
+    // Upload gallery which is multiple
     if (req.files?.gallery) {
       for (let file of req.files.gallery) {
         const result = await cloudinary.uploader.upload(file.path, {
@@ -39,7 +39,7 @@ exports.createUser = async (req, res) => {
           url: result.secure_url,
           publicId: result.public_id
         }
-        fs.unlinkSync(file.path) // remove local file
+        fs.unlinkSync(file.path) 
       }
     }
 
@@ -62,7 +62,6 @@ exports.createUser = async (req, res) => {
       data: user
     })
   } catch (error) {
-    // cleanup temp files in case of error
     if (req.files?.dp) fs.unlinkSync(req.files.dp[0].path)
     if (req.files?.gallery) {
       req.files.gallery.forEach(f => {
@@ -72,4 +71,30 @@ exports.createUser = async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 }
-exports.getall = async 
+exports.getall = async ()=>{
+    try {
+        const user = await usermodel.find()
+        res.status(200).json({
+            message: `users availabe`,
+            data: user
+        })
+     } catch (error) {
+        res.status( 500).json({
+            message: error.message
+        })
+     }
+}
+exports.getone = async (req,res)=>{
+    const id = req.params.id
+     try {
+        const user = await usermodel.findById(id)
+        res.status(200).json({
+            message: `users availabe`,
+            data: user
+        })
+     } catch (error) {
+        res.status( 500).json({
+            message: error.message
+        })
+     }
+}
